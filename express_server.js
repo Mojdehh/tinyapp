@@ -9,31 +9,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 
-function generateRandomString() {
-  const len = 6, 
-  str = "";
-  while(str.length < len) str += Math.random().toString(36).substr(2);
-  str = str.substr(0, len);
+const generateRandomString = function() {
+  let str = Math.random().toString(36).substr(2, 6);
   return str;
-}
-
+};
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-app.get("/", (req, res) => {
-  res.send('Hello!');
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls : urlDatabase };
@@ -52,10 +37,15 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  res.send("ok");
-})
+  const shortStr = generateRandomString();
+  urlDatabase[shortStr] = req.body.longURL;
+  res.redirect(`/urls/${shortStr}`);
+});
 
-
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL]
+  res.redirect(longURL);
+});
 
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
