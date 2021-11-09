@@ -7,6 +7,17 @@ app.set("view engine", "ejs");
 
 app.use(bodyParser.urlencoded({extended: true}));
 
+
+
+function generateRandomString() {
+  const len = 6, 
+  str = "";
+  while(str.length < len) str += Math.random().toString(36).substr(2);
+  str = str.substr(0, len);
+  return str;
+}
+
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -44,6 +55,9 @@ app.post("/urls", (req, res) => {
   res.send("ok");
 })
 
+
+
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
