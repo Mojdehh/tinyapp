@@ -39,6 +39,10 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send("ok");
+})
 
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
