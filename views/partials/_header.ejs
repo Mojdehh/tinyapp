@@ -20,7 +20,7 @@
     <% } %>
 
     <% if (username) { %>
-      <form class="form-inline" method="GET" action="/urls">
+      <form class="form-inline" action="/logout" method="POST">
         <div class="form-group mb-2"></div>
           <h6 class="card-text">Logged in As: <%= username %></h6>
           <button type="submit" class="btn btn-outline-dark">Logout</button>
