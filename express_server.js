@@ -23,7 +23,10 @@ const urlDatabase = {
 
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls : urlDatabase };
+  const templateVars = { 
+    urls : urlDatabase,
+    username: req.cookies["username"] 
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -61,9 +64,15 @@ app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
-  res.redirect(`/urls`);
+  res.redirect("/urls");
 });
 
+app.post("/login", (req, res) => {
+  const userName = req.body.username;
+  console.log(userName);
+  res.cookie('username', userName);
+  res.redirect("/urls");
+});
 
 
 app.listen(8080, () => {
