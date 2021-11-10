@@ -47,6 +47,15 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log(req.params.shortURL);
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
+
+
+
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
