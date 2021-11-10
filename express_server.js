@@ -54,6 +54,10 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  res.redirect(`/urls/${id}`);
+});
 
 
 app.listen(8080, () => {
