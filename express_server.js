@@ -35,7 +35,7 @@ const users = {
 };
 
 // Email lookup helper function
-const emailLookUp = function(email) {
+const getUserByEmail = function(email) {
   for (key in users) {
     if (users[key].email === email) return users[key];
   }
@@ -113,9 +113,8 @@ app.post("/urls/:id", (req, res) => {
 
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  console.log(email);
-  // const userId = "2";
-  res.cookie('user_id', userId);
+  const user = getUserByEmail(email) 
+  res.cookie('user_id', user.id);
   res.redirect("/urls");
 });
 
@@ -130,7 +129,7 @@ app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     return res.status(400).send('Bad Request: Username and/or Password cannot be empty!');
   }
-  const user = emailLookUp(req.body.email) 
+  const user = getUserByEmail(req.body.email) 
   if (user) {
     res.status(400).send('Bad Request: Email already exists!');
   } else {
