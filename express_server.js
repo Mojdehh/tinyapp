@@ -10,9 +10,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(cookieParser());
 
-
-const generateRandomString = function() {
-  let str = Math.random().toString(36).substr(2, 6);
+// create a random alphanumeric string
+const generateRandomString = function(len) {
+  let str = Math.random().toString(36).substr(2, len);
   return str;
 };
 
@@ -21,6 +21,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
+
+//user: users[req.cookies["user_id"]]
 
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -56,7 +70,7 @@ app.get("/register", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  const shortStr = generateRandomString();
+  const shortStr = generateRandomString(6);
   urlDatabase[shortStr] = req.body.longURL;
   res.redirect(`/urls/${shortStr}`);
 });
@@ -92,6 +106,20 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
 });
+
+//create registration handler
+app.post("/register", (req, res) => {
+  const userId = generateRandomString(5)
+  users[userId] = {
+    id: userId,
+    email: req.body.email,
+    password: req.body.password
+  }
+  console.log(users);
+  res.cookie('user_id', userId);
+  res.redirect("/urls");
+});
+
 
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
