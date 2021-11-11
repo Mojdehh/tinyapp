@@ -5,9 +5,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
-
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.use(cookieParser());
 
 // create a random alphanumeric string
@@ -36,7 +34,7 @@ const users = {
 
 // Email lookup helper function
 const getUserByEmail = function(email) {
-  for (key in users) {
+  for (let key in users) {
     if (users[key].email === email) return users[key];
   }
 };
@@ -50,12 +48,14 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
 });
+
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
@@ -66,7 +66,8 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-// create registration page
+
+// Registration page
 app.get("/register", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
@@ -75,7 +76,7 @@ app.get("/register", (req, res) => {
 });
 
 
-// create Login page
+// Login page
 app.get("/login", (req, res) => {
   const templateVars = {
     user: users[req.cookies["user_id"]]
@@ -90,6 +91,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortStr] = req.body.longURL;
   res.redirect(`/urls/${shortStr}`);
 });
+
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
@@ -115,7 +117,7 @@ app.post("/urls/:id", (req, res) => {
 // Login Handler
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  const user = getUserByEmail(email)
+  const user = getUserByEmail(email);
   if (user) {
     // password check
     if (user.password === password) {
@@ -130,18 +132,19 @@ app.post("/login", (req, res) => {
 });
 
 
+//Logout Handler
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 
-//create registration handler
+//Registration handler
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
-    return res.status(400).send('Bad Request: Username and/or Password cannot be empty!');
+    return res.status(400).send('Bad Request: Email and/or Password cannot be empty!');
   }
-  const user = getUserByEmail(req.body.email) 
+  const user = getUserByEmail(req.body.email);
   if (user) {
     res.status(400).send('Bad Request: Email already exists!');
   } else {
