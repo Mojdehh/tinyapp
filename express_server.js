@@ -87,9 +87,13 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  const shortStr = generateRandomString(6);
-  urlDatabase[shortStr] = req.body.longURL;
-  res.redirect(`/urls/${shortStr}`);
+  //check if user is logged in
+  if (req.cookies["user_id"]) {
+    const shortStr = generateRandomString(6);
+    urlDatabase[shortStr] = req.body.longURL;
+    res.redirect(`/urls/${shortStr}`);
+  }
+  res.redirect("/login");
 });
 
 
