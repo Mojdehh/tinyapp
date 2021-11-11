@@ -111,12 +111,24 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+
+// Login Handler
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  const user = getUserByEmail(email) 
-  res.cookie('user_id', user.id);
-  res.redirect("/urls");
+  const user = getUserByEmail(email)
+  if (user) {
+    // password check
+    if (user.password === password) {
+      res.cookie('user_id', user.id);
+      res.redirect("/urls");
+    } else {
+      res.status(403).send('Bad Request: Incorrect Password!');
+    }
+  } else {
+    res.status(403).send('Bad Request: Email cannot be found!');
+  }
 });
+
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
