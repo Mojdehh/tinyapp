@@ -29,7 +29,13 @@ const users = {
   },
 };
 
-//user: users[req.cookies["user_id"]]
+// Email lookup helper function
+const emailLookUp = function(email) {
+  for (let user in users) {
+    if (users[user].email === email);
+    return true;
+  }
+};
 
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -108,17 +114,20 @@ app.post("/logout", (req, res) => {
 //create registration handler
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('Bad Request: Username and/or Password cannot be empty!')
-  };
-  const userId = generateRandomString(5)
-  users[userId] = {
-    id: userId,
-    email: req.body.email,
-    password: req.body.password
+    res.status(400).send('Bad Request: Username and/or Password cannot be empty!');
+  } else if (emailLookUp(req.body.email)) {
+    res.status(400).send('Bad Request: Email already exists!');
+  } else {
+    const userId = generateRandomString(5);
+    users[userId] = {
+      id: userId,
+      email: req.body.email,
+      password: req.body.password
+    };
+    console.log(users);
+    res.cookie('user_id', userId);
+    res.redirect("/urls");
   }
-  console.log(users);
-  res.cookie('user_id', userId);
-  res.redirect("/urls");
 });
 
 
