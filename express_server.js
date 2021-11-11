@@ -30,12 +30,14 @@ const users = {
 };
 
 // Email lookup helper function
-const emailLookUp = function(email) {
+const emailLookUp = function(em) {
+  let counter = 0;
   for (let user in users) {
-    if (users[user].email === email);
-    return true;
+    if(users[user].email === em) counter++;
   }
+  if (counter > 1) return true;
 };
+
 
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -70,6 +72,16 @@ app.get("/register", (req, res) => {
   };
   res.render("registration", templateVars);
 });
+
+
+// create Login page
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("user_login", templateVars);
+});
+
 
 app.post("/urls", (req, res) => {
   console.log(req.body);
