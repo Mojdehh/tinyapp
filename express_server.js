@@ -107,6 +107,9 @@ app.post("/logout", (req, res) => {
 
 //create registration handler
 app.post("/register", (req, res) => {
+  if (req.body.email === "" || req.body.password === "") {
+    res.status(400).send('Bad Request: Username and/or Password cannot be empty!')
+  };
   const userId = generateRandomString(5)
   users[userId] = {
     id: userId,
