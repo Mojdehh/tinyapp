@@ -37,7 +37,7 @@ const users = {
 // Email lookup helper function
 const emailLookUp = function(email) {
   for (key in users) {
-    if (users[key].email === email) return true;
+    if (users[key].email === email) return users[key];
   }
 };
 
@@ -114,7 +114,8 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
   console.log(email);
-  // res.cookie('username', userName);
+  // const userId = "2";
+  res.cookie('user_id', userId);
   res.redirect("/urls");
 });
 
@@ -127,8 +128,10 @@ app.post("/logout", (req, res) => {
 //create registration handler
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
-    res.status(400).send('Bad Request: Username and/or Password cannot be empty!');
-  } else if (emailLookUp(req.body.email)) {
+    return res.status(400).send('Bad Request: Username and/or Password cannot be empty!');
+  }
+  const user = emailLookUp(req.body.email) 
+  if (user) {
     res.status(400).send('Bad Request: Email already exists!');
   } else {
     const userId = generateRandomString(5);
