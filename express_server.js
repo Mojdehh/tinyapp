@@ -22,20 +22,23 @@ const urlDatabase = {
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+  "1": {
+    id: "1",
+    email: "test@yahoo.com",
+    password: "123456"
   },
+  "2": {
+    id: "2",
+    email: "test@gmail.com",
+    password: "654321"
+  }
 };
 
 // Email lookup helper function
-const emailLookUp = function(em) {
-  let counter = 0;
-  for (let user in users) {
-    if(users[user].email === em) counter++;
+const emailLookUp = function(email) {
+  for (key in users) {
+    if (users[key].email === email) return true;
   }
-  if (counter > 1) return true;
 };
 
 
@@ -49,7 +52,6 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templateVars);
@@ -59,7 +61,6 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
     user: users[req.cookies["user_id"]]
   };
   res.render("urls_show", templateVars);
@@ -111,9 +112,9 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  const userName = req.body.username;
-  console.log(userName);
-  res.cookie('username', userName);
+  const {email, password} = req.body;
+  console.log(email);
+  // res.cookie('username', userName);
   res.redirect("/urls");
 });
 
