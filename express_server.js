@@ -85,7 +85,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) {
-    res.redirect('/login');
+    return res.status(404).send('You must <a href="/login">login</a> or <a href="/register">register</a> first.');
   }
   const templateVars = {
     user: users[userID]
@@ -172,7 +172,7 @@ app.post("/urls", (req, res) => {
     };
     res.redirect(`/urls/${shortStr}`);
   }
-  res.redirect("/login");
+  return res.status(404).send('Please <a href="/login">login</a> or <a href="/register">register</a> first.');
 });
 
 
