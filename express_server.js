@@ -56,8 +56,8 @@ const generateRandomString = function(len) {
 
 
 // Email lookup helper function
-const getUserByEmail = function(email) {
-  for (let key in users) {
+const getUserByEmail = function(email, userDB) {
+  for (let key in userDB) {
     if (users[key].email === email) return users[key];
   }
 };
@@ -180,7 +180,7 @@ app.post("/urls/:id", (req, res) => {
 // Login Handler
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email, users);
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (user) {
@@ -203,7 +203,7 @@ app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     return res.status(400).send('Email and/or Password cannot be empty!');
   }
-  const user = getUserByEmail(req.body.email);
+  const user = getUserByEmail(req.body.email, users);
   if (user) {
     return res.status(400).send('User already exists!');
   } else {
