@@ -173,9 +173,11 @@ app.post("/urls/:id", (req, res) => {
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
   const user = getUserByEmail(email);
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
   if (user) {
     // password check
-    if (user.password === password) {
+    if (bcrypt.compareSync(user.password, hashedPassword)) {
       res.cookie('user_id', user.id);
       res.redirect("/urls");
     } else {
@@ -207,7 +209,7 @@ app.post("/register", (req, res) => {
     users[userId] = {
       id: userId,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     };
     console.log(users);
     res.cookie('user_id', userId);
