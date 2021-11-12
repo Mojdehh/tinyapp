@@ -53,24 +53,29 @@ const getUserByEmail = function(email) {
   }
 };
 
-//
-// const urlsForUser = function(id) {
-//   const results = {};
-//   const keys = Object.keys(urlDatabase);
-//   for (let shortURL of keys) {
-//     const url = urlDatabase[shortURL]
-//     if(url.userID === id) {
-//       results[shortURL] = url;
-//     }
-//   }
-//   return results;
-// };
+// Function to store user's URLs
+const urlsForUser = function(id) {
+  const results = {};
+  const keys = Object.keys(urlDatabase);
+  for (let shortURL of keys) {
+    const url = urlDatabase[shortURL]
+    if(url.userID === id) {
+      results[shortURL] = url;
+    }
+  }
+  return results;
+};
+
 
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const userURLs = urlsForUser(userID);
+
   const templateVars = {
-    urls : urlDatabase,
-    user: users[req.cookies["user_id"]]
+    urls: userURLs,
+    user: users[userID],
   };
+
   res.render("urls_index", templateVars);
 });
 
