@@ -56,6 +56,15 @@ const users = {
 
 //*******************GET endpoints*******************//
 
+// Set homepage
+app.get("/", (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  } 
+  res.redirect('/login');
+});
+
+
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
   const userURLs = urlsForUser(userID, urlDatabase);
