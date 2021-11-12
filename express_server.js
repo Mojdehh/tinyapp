@@ -1,13 +1,21 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
+const morgan = require("morgan");
+const cookieSession = require('cookie-session');
+
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(morgan('dev'));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2']
+}));
 
 
 const urlDatabase = {
@@ -199,11 +207,11 @@ app.post("/logout", (req, res) => {
 //Registration handler
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
-    return res.status(400).send('Bad Request: Email and/or Password cannot be empty!');
+    return res.status(400).send('Email and/or Password cannot be empty!');
   }
   const user = getUserByEmail(req.body.email);
   if (user) {
-    return res.status(400).send('Bad Request: Email already exists!');
+    return res.status(400).send('User already exists!');
   } else {
     const userId = generateRandomString(5);
     users[userId] = {
