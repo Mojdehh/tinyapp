@@ -70,7 +70,9 @@ const urlsForUser = function(id) {
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
   const userURLs = urlsForUser(userID);
-
+  if (!userID) {
+    return res.status(400).send('You must <a href="/login">login</a> first.')
+  }
   const templateVars = {
     urls: userURLs,
     user: users[userID],
@@ -88,13 +90,21 @@ app.get("/urls/new", (req, res) => {
 });
 
 
+// Seperate page to show shortURL and edit longURL
 app.get("/urls/:shortURL", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const url = urlDatabase[req.params.shortURL];
+
+  if(!url) {
+    return res.status(404).send("URL not found!");
+  }
+
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies["user_id"]]
+    longURL: url.longURL,
+    user: users[userID]
   };
-  console.log(templateVars);
+
   res.render("urls_show", templateVars);
 });
 
@@ -124,11 +134,12 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //check if user is logged in
-  if (req.cookies["user_id"]) {
+  const userID = req.cookies["user_id"];
+  if (userID) {
     const shortStr = generateRandomString(6);
     urlDatabase[shortStr] = {
       longURL: req.body.longURL,
-      userID: req.cookies["user_id"]
+      userID
     };
     res.redirect(`/urls/${shortStr}`);
   }
@@ -138,7 +149,6 @@ app.post("/urls", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
-  // console.log(longURL);
   res.redirect(longURL);
 });
 
