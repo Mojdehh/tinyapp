@@ -29,7 +29,7 @@ const urlDatabase = {
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW"
+    userID: "1"
   },
   b2xVn2: {
     longURL: "http://www.lighthouselabs.ca",
@@ -83,8 +83,12 @@ app.get("/urls", (req, res) => {
 
 // Add new URL
 app.get("/urls/new", (req, res) => {
+  const userID = req.session.user_id;
+  if (!userID) {
+    res.redirect('/login');
+  }
   const templateVars = {
-    user: users[req.session.user_id]
+    user: users[userID]
   };
   res.render("urls_new", templateVars);
 });
@@ -95,18 +99,26 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const userID = req.session.user_id;
   const url = urlDatabase[req.params.shortURL];
+  if (!userID) {
+    return res.status(404).send('You are logged out! Please <a href="/login">login</a> or <a href="/register">register</a>.');
+  }
 
   if (!url) {
     return res.status(404).send("URL not found!");
   }
 
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: url.longURL,
-    user: users[userID]
-  };
+  if (url) {
+    if (url.userID !== userID) {
+      return res.status(404).send("This URL belongs to someone else, you do not have permission to modify it!");
+    }
+    const templateVars = {
+      shortURL: req.params.shortURL,
+      longURL: url.longURL,
+      user: users[userID]
+    };
+    res.render("urls_show", templateVars);
+  }
 
-  res.render("urls_show", templateVars);
 });
 
 
