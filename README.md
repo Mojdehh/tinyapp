@@ -7,9 +7,12 @@ Don't worry about the security as we have you backed up with encrypted cookies a
 
 ## Final Product
 
-!["screenshot description"](#)
+!["New User Registration Page"](https://github.com/Mojdehh/tinyapp/blob/master/docs/register_page.PNG?raw=true)
 
-!["screenshot description"](#)
+!["URLs Page"](https://github.com/Mojdehh/tinyapp/blob/master/docs/urls-page.PNG?raw=true)
+
+!["URLs show"](https://github.com/Mojdehh/tinyapp/blob/master/docs/url_show.PNG?raw=true)
+
 
 ## Dependencies
 
