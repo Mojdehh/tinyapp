@@ -1,24 +1,27 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(morgan('dev'));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
 
+app.listen(8080, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
 
+
+//****************Data sets***************//
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -47,33 +50,15 @@ const users = {
     password: "654321"
   }
 };
-
-
-// create a random alphanumeric string
-const generateRandomString = function(len) {
-  let str = Math.random().toString(36).substr(2, len);
-  return str;
-};
+//************************************//
 
 
 
-// Function to store user's URLs
-const urlsForUser = function(id) {
-  const results = {};
-  const keys = Object.keys(urlDatabase);
-  for (let shortURL of keys) {
-    const url = urlDatabase[shortURL];
-    if (url.userID === id) {
-      results[shortURL] = url;
-    }
-  }
-  return results;
-};
-
+//*******************GET endpoints*******************//
 
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
-  const userURLs = urlsForUser(userID);
+  const userURLs = urlsForUser(userID, urlDatabase);
   // if (!userID) {
   //   return res.status(400).send('You must <a href="/login">login</a> first.');
   // }
@@ -86,12 +71,15 @@ app.get("/urls", (req, res) => {
 });
 
 
+
+// Add new URL
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id]
   };
   res.render("urls_new", templateVars);
 });
+
 
 
 // Seperate page to show shortURL and edit longURL
@@ -113,6 +101,7 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 
+
 // Registration page
 app.get("/register", (req, res) => {
   const id = req.session.user_id;
@@ -123,8 +112,9 @@ app.get("/register", (req, res) => {
   if (user) {
     return res.redirect("/urls");
   }
-  res.render("registration", templateVars);
+  res.render("user_register", templateVars);
 });
+
 
 
 // Login page
@@ -135,6 +125,17 @@ app.get("/login", (req, res) => {
   res.render("user_login", templateVars);
 });
 
+
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  res.redirect(longURL);
+});
+//****************************************************//
+
+
+
+//*******************POST endpoints*******************//
 
 app.post("/urls", (req, res) => {
   //check if user is logged in
@@ -151,17 +152,13 @@ app.post("/urls", (req, res) => {
 });
 
 
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
-});
-
-
+// Delete a URL
 app.post("/urls/:shortURL/delete", (req, res) => {
   console.log(req.params.shortURL);
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
+
 
 
 app.post("/urls/:id", (req, res) => {
@@ -170,6 +167,7 @@ app.post("/urls/:id", (req, res) => {
   urlDatabase[shortURL].longURL = longURL;
   res.redirect("/urls");
 });
+
 
 
 // Login Handler
@@ -193,7 +191,7 @@ app.post("/login", (req, res) => {
 
 
 
-//Registration handler
+// Registration Handler
 app.post("/register", (req, res) => {
   if (req.body.email === "" || req.body.password === "") {
     return res.status(400).send('Email and/or Password cannot be empty!');
@@ -215,14 +213,11 @@ app.post("/register", (req, res) => {
 });
 
 
-//Logout Handler
+
+// Logout Handler
 app.post("/logout", (req, res) => {
   req.session.user_id = null; // clear cookies
   res.redirect("/urls");
 });
-
-
-app.listen(8080, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
+//***************************************************//
 
