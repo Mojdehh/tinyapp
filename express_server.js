@@ -67,8 +67,8 @@ const urlsForUser = function(id) {
   const results = {};
   const keys = Object.keys(urlDatabase);
   for (let shortURL of keys) {
-    const url = urlDatabase[shortURL]
-    if(url.userID === id) {
+    const url = urlDatabase[shortURL];
+    if (url.userID === id) {
       results[shortURL] = url;
     }
   }
@@ -77,10 +77,10 @@ const urlsForUser = function(id) {
 
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const userURLs = urlsForUser(userID);
   if (!userID) {
-    return res.status(400).send('You must <a href="/login">login</a> first.')
+    return res.status(400).send('You must <a href="/login">login</a> first.');
   }
   const templateVars = {
     urls: userURLs,
@@ -93,7 +93,7 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render("urls_new", templateVars);
 });
@@ -101,10 +101,10 @@ app.get("/urls/new", (req, res) => {
 
 // Seperate page to show shortURL and edit longURL
 app.get("/urls/:shortURL", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const url = urlDatabase[req.params.shortURL];
 
-  if(!url) {
+  if (!url) {
     return res.status(404).send("URL not found!");
   }
 
@@ -120,7 +120,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // Registration page
 app.get("/register", (req, res) => {
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id;
   const user = users[id];
   const templateVars = {
     user: users[id]
@@ -135,7 +135,7 @@ app.get("/register", (req, res) => {
 // Login page
 app.get("/login", (req, res) => {
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render("user_login", templateVars);
 });
@@ -143,7 +143,7 @@ app.get("/login", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //check if user is logged in
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   if (userID) {
     const shortStr = generateRandomString(6);
     urlDatabase[shortStr] = {
@@ -186,7 +186,7 @@ app.post("/login", (req, res) => {
   if (user) {
     // password check
     if (bcrypt.compareSync(user.password, hashedPassword)) {
-      res.cookie('user_id', user.id);
+      req.session.user_id = user.id;
       res.redirect("/urls");
     } else {
       return res.status(403).send('Bad Request: Incorrect Password!');
@@ -196,12 +196,6 @@ app.post("/login", (req, res) => {
   }
 });
 
-
-//Logout Handler
-app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
-  res.redirect("/urls");
-});
 
 
 //Registration handler
@@ -223,6 +217,13 @@ app.post("/register", (req, res) => {
     res.cookie('user_id', userId);
     res.redirect("/urls");
   }
+});
+
+
+//Logout Handler
+app.post("/logout", (req, res) => {
+  req.session.user_id = null; // clear cookies
+  res.redirect("/urls");
 });
 
 
