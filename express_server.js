@@ -147,7 +147,7 @@ app.get("/login", (req, res) => {
 });
 
 
-
+// Redirect to main URL
 app.get("/u/:shortURL", (req, res) => {
   if (!urlDatabase[req.params.shortURL]) {
     return res.status(404).send("This URL is not in our data base!");
@@ -184,7 +184,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 
-
+// Edit a URL
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = req.body.longURL;
@@ -217,11 +217,11 @@ app.post("/login", (req, res) => {
 
 // Registration Handler
 app.post("/register", (req, res) => {
-  if (req.body.email === "" || req.body.password === "") {
+  if (req.body.email === "" || req.body.password === "") {//check if email or pass is empty
     return res.status(400).send('Email and/or Password cannot be empty!');
   }
   const user = getUserByEmail(req.body.email, users);
-  if (user) {
+  if (user) { // check if user exists
     return res.status(400).send('User already exists!');
   } else {
     const userId = generateRandomString(5);
