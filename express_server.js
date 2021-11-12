@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const morgan = require("morgan");
 const cookieSession = require('cookie-session');
+const { getUserByEmail } = require('./helpers');
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -55,12 +56,6 @@ const generateRandomString = function(len) {
 };
 
 
-// Email lookup helper function
-const getUserByEmail = function(email, userDB) {
-  for (let key in userDB) {
-    if (users[key].email === email) return users[key];
-  }
-};
 
 // Function to store user's URLs
 const urlsForUser = function(id) {
@@ -79,9 +74,9 @@ const urlsForUser = function(id) {
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
   const userURLs = urlsForUser(userID);
-  if (!userID) {
-    return res.status(400).send('You must <a href="/login">login</a> first.');
-  }
+  // if (!userID) {
+  //   return res.status(400).send('You must <a href="/login">login</a> first.');
+  // }
   const templateVars = {
     urls: userURLs,
     user: users[userID],
@@ -214,7 +209,7 @@ app.post("/register", (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10)
     };
     console.log(users);
-    res.cookie('user_id', userId);
+    req.session.user_id = userId;
     res.redirect("/urls");
   }
 });
