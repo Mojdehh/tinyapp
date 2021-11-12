@@ -60,7 +60,7 @@ const users = {
 app.get("/", (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
-  } 
+  }
   res.redirect('/login');
 });
 
@@ -68,9 +68,9 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userID = req.session.user_id;
   const userURLs = urlsForUser(userID, urlDatabase);
-  // if (!userID) {
-  //   return res.status(400).send('You must <a href="/login">login</a> first.');
-  // }
+  if (!userID) {
+    return res.status(400).send('You are logged out! Please <a href="/login">login</a> or <a href="/register">register</a>.');
+  }
   const templateVars = {
     urls: userURLs,
     user: users[userID],
