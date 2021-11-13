@@ -16,6 +16,7 @@ app.use(cookieSession({
   keys: ['key1', 'key2']
 }));
 
+
 app.listen(8080, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
@@ -240,7 +241,7 @@ app.post("/register", (req, res) => {
 
 // Logout Handler
 app.post("/logout", (req, res) => {
-  req.session.user_id = null; // clear cookies
+  req.session = null; // clear cookies
   res.redirect("/urls");
 });
 //***************************************************//
